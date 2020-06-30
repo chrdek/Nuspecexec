@@ -8,12 +8,13 @@ $writerconfig.NamespaceHandling = [System.Xml.NamespaceHandling]::OmitDuplicates
 $writerconfig.ConformanceLevel = [System.Xml.ConformanceLevel]::Document;
 $writerconfig.Indent = $true;
 
-
+Try { # handle errors
 [string] $solFolder = "$(Split-Path "." -Leaf)";
 [string] $projectName = (Get-ChildItem -Path "." -Filter "*.*proj").Name.Split('.')[0];
 [string] $projectFolder = [System.Environment]::CurrentDirectory -ireplace "$solFolder\bin\Debug", "";
 [string[]] $alldir=$null; [string[]] $alldll;
 $path = $(Resolve-Path .).Path;
+} Catch { $error | Out-Null } # Error suppression for external usage.
 
 if (Test-Path "$($path)\bin\Debug") {
    $alldll += [System.IO.Directory]::EnumerateFiles("${path}\bin\Debug","*.dll");
