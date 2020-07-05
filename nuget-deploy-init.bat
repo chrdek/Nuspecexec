@@ -19,7 +19,6 @@ Set RELEASE=releases/download/1.1.8.10/Nuspec
 
 :: Check for proper file(s) in executing  folder.
 dir %projects% | findstr /i "file not found" & IF %Errorlevel% NEQ 0 GOTO :REMOTEFETCH
-:: & IF %Errorlevel% NEQ 0 EXIT /b !Errorlevel!
 
 nuget.exe spec
 IF %errorlevel% NEQ 0 (
@@ -41,12 +40,10 @@ IF %errorlevel% NEQ 0 (
   @ECHO.
   @ECHO EXE not present, retrieve/running remote source...
   @ECHO OFF
-  Set remote="https://raw.githubusercontent.com/chrdek/!MASTER!"
+  :: Set remote="https://raw.githubusercontent.com/chrdek/!MASTER!"
   :: Set remotexecps1="https://github.com/chrdek/!RELEASE!!RELPS1!.exe"
   Set remotexec="https://github.com/chrdek/!RELEASE!.exe"
 
-:: powershell -command "$(wget -Uri $([Uri]::new('%remote%'))).Content | Set-Content -Path %nuspecexe%.exe"
-:: powershell -command "$(wget -Uri $([Uri]::new('http://raw.githubusercontent.com/chrdek/Nuspecexec/master/Nuspec.ps1'))).Content | Set-Content -Path %nuspecps1%"
 powershell -command "$content=$(wget -Uri $([Uri]::new('http://raw.githubusercontent.com/chrdek/Nuspecexec/master/Nuspec.ps1'))).Content;($content -replace $content[0],'') | Set-Content -Path %nuspecps1%"
 powershell -command ". %nuspecps1%" & GOTO :LOCALCREATE
 
@@ -70,8 +67,8 @@ IF %ErrorLevel% NEQ 0 (
 :: adds to the associated nuget host config list.
 :LOCALCREATE
 @ECHO OFF
-:: xcopy %USERPROFILE%\Downloads\conn4\favicon.png .\ /F /J /I
-xcopy %USERPROFILE%\Downloads\conn4\nuget.exe .\ /F /J /I
+:: Use package image in repo or other.
+xcopy %USERPROFILE%\favicon.png .\ /F /J /I
 :: Alternative - FOR /F %%a IN ('Powershell.exe -Command "$([guid]::NewGuid().ToString())"') DO ( SET GUID=%%a )
 FOR /F %%a IN ('powershell -command ("[Guid]::NewGuid()).Guid"') DO ( SET GUID=%%a )
  nuget.exe setApikey %GUID% -NonInteractive & nuget.exe pack .nuspec -IncludeReferencedProjects -properties Configuration=Release -Force
